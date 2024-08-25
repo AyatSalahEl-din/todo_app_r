@@ -20,7 +20,7 @@ class Task {
           title: data['title'],
           description: data['description'],
           datetime: DateTime.fromMillisecondsSinceEpoch(data['dateTime']),
-          isDone: data['isDone'],
+          isDone: data['isDone'] ?? false,
         );
 
 ////toFireStore:

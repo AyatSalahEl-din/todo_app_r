@@ -8,10 +8,15 @@ import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/provider/list_provider.dart';
 
-class TaskListItem extends StatelessWidget {
+class TaskListItem extends StatefulWidget {
   Task task;
   TaskListItem({required this.task});
 
+  @override
+  State<TaskListItem> createState() => _TaskListItemState();
+}
+
+class _TaskListItemState extends State<TaskListItem> {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<ListProvider>(context);
@@ -30,7 +35,7 @@ class TaskListItem extends StatelessWidget {
             SlidableAction(
               borderRadius: BorderRadius.circular(15),
               onPressed: (context) {
-                FirebaseUtils.deleteTaskFromFireStore(task)
+                FirebaseUtils.deleteTaskFromFireStore(widget.task)
                     .timeout(Duration(seconds: 1), onTimeout: () {
                   print('task deleted successfully');
                   listProvider.getAllTasksFromFireStore();
@@ -48,7 +53,8 @@ class TaskListItem extends StatelessWidget {
               onPressed: (context) {
                 showModalBottomSheet(
                     context: context,
-                    builder: (context) => AddTaskBottomSheet(task: task));
+                    builder: (context) =>
+                        AddTaskBottomSheet(task: widget.task));
               },
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -73,38 +79,61 @@ class TaskListItem extends StatelessWidget {
                     margin: EdgeInsets.all(15),
                     height: MediaQuery.of(context).size.height * 0.1,
                     width: 4,
-                    color: AppColors.primaryColor,
+                    color: widget.task.isDone
+                        ? AppColors.greenColor
+                        : AppColors.primaryColor,
                   ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          task.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: AppColors.primaryColor),
+                          widget.task.title,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: widget.task.isDone
+                                        ? AppColors.greenColor
+                                        : AppColors.primaryColor,
+                                  ),
                         ),
                         Text(
-                          task.description,
+                          widget.task.description,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    style: IconButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18))),
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.check,
-                      color: AppColors.whiteColor,
-                    ),
-                  )
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      style: IconButton.styleFrom(
+                          backgroundColor: widget.task.isDone
+                              ? Colors.transparent
+                              : AppColors.primaryColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18))),
+                      onPressed: () {
+                        setState(() {
+                          widget.task.isDone = !widget.task.isDone;
+                          FirebaseUtils.editTaskFromFireStore(widget.task)
+                              .timeout(
+                            Duration(seconds: 1),
+                            onTimeout: () {
+                              print('task updated successfully');
+                              listProvider.getAllTasksFromFireStore();
+                            },
+                          );
+                        });
+                      },
+                      icon: widget.task.isDone
+                          ? Text(
+                              "Done!",
+                              style: TextStyle(
+                                  color: AppColors.greenColor, fontSize: 18),
+                            )
+                          : Icon(
+                              Icons.check,
+                              color: AppColors.whiteColor,
+                            )),
                 ])),
       ),
     );
