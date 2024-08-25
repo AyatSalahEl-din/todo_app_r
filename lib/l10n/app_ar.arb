@@ -12,5 +12,8 @@
 "select_date": "إختر التاريخ",
 "add": "إضافة",
 "enter_task_title" : "أدخل عنوان المهمة",
-"enter_task_description" : "أدخل وصف المهمة"
+"enter_task_description" : "أدخل وصف المهمة",
+"edit" : "تعديل",
+"delete" : "مسح",
+"edit_task" : "تعديل المهمة"
 }

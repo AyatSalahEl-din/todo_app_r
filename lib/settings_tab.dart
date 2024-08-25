@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/app_colors.dart';
 import 'package:todo_app/lang_bot_sheet.dart';
 import 'package:todo_app/theme_bot_sheet.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:todo_app/provider/app_config_provider.dart';
 
 class SettingsTab extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class _SettingsTabState extends State<SettingsTab> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    var provider = Provider.of<AppConfigProvider>(context);
     return Container(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Padding(
@@ -37,7 +40,10 @@ class _SettingsTabState extends State<SettingsTab> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(AppLocalizations.of(context)!.english,
+                Text(
+                    provider.appLanguage == 'en'
+                        ? AppLocalizations.of(context)!.english
+                        : AppLocalizations.of(context)!.arabic,
                     style: Theme.of(context).textTheme.bodyMedium),
                 Icon(Icons.arrow_drop_down)
               ],
@@ -66,7 +72,10 @@ class _SettingsTabState extends State<SettingsTab> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(AppLocalizations.of(context)!.light,
+                Text(
+                    provider.appMode == ThemeMode.light
+                        ? AppLocalizations.of(context)!.light
+                        : AppLocalizations.of(context)!.dark,
                     style: Theme.of(context).textTheme.bodyMedium),
                 Icon(Icons.arrow_drop_down)
               ],

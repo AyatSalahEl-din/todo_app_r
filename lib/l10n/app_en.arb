@@ -12,5 +12,8 @@
 "select_date": "Select Date",
 "add": "Add",
 "enter_task_title" : "Enter Task Title",
-"enter_task_description" : "Enter Task Description"
+"enter_task_description" : "Enter Task Description",
+"edit" : "Edit",
+"delete" : "Delete",
+"edit_task" : "Edit Task"
 }
