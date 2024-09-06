@@ -23,7 +23,7 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-        create: (context) => AppConfigProvider(),
+        create: (context) => AppConfigProvider(), //..getConfigData(),
       ),
       ChangeNotifierProvider(
         create: (context) => ListProvider(),
