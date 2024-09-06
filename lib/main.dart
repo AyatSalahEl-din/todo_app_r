@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     var provider = Provider.of<AppConfigProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: HomeScreen.routeName,
+      initialRoute: LoginScreen.routeName,
       routes: {
         HomeScreen.routeName: (context) => HomeScreen(),
         RegisterScreen.routeName: (context) => RegisterScreen(),
