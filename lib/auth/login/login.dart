@@ -1,19 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/auth/custom_text_form_field.dart';
 import 'package:todo_app/auth/register/register.dart';
 import 'package:todo_app/dialog_utils.dart';
+import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/home.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = 'login_screen';
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
-
   var formKey = GlobalKey<FormState>();
+  late UserProvider userProvider;
+
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -111,6 +116,16 @@ class LoginScreen extends StatelessWidget {
           //hide loading
           //show message
         );
+
+        var user = await FirebaseUtils.readUserFromFireStore(
+            credential.user?.uid ?? '');
+        if (user == null) {
+          return;
+        }
+        //another way for provider : listen (hnadyeh mara wa7da bs)
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateUser(user);
+
         //hide loading
         DialogUtils.hideLoading(context);
         //show message
@@ -120,7 +135,7 @@ class LoginScreen extends StatelessWidget {
             title: 'Success',
             posActionName: 'OK',
             posAction: () {
-              Navigator.of(context).pushNamed(HomeScreen.routeName);
+              Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
             });
         print(credential.user?.uid ?? "");
       } on FirebaseAuthException catch (e) {

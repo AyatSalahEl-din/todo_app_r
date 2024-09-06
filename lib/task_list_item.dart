@@ -7,6 +7,7 @@ import 'package:todo_app/app_colors.dart';
 import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 class TaskListItem extends StatefulWidget {
   Task task;
@@ -35,10 +36,18 @@ class _TaskListItemState extends State<TaskListItem> {
             SlidableAction(
               borderRadius: BorderRadius.circular(15),
               onPressed: (context) {
-                FirebaseUtils.deleteTaskFromFireStore(widget.task)
-                    .timeout(Duration(seconds: 1), onTimeout: () {
+                var userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
+                FirebaseUtils.deleteTaskFromFireStore(
+                        widget.task, userProvider.currentUser!.id)
+                    .then((value) {
                   print('task deleted successfully');
-                  listProvider.getAllTasksFromFireStore();
+                  listProvider
+                      .getAllTasksFromFireStore(userProvider.currentUser!.id);
+                }).timeout(Duration(seconds: 1), onTimeout: () {
+                  print('task deleted successfully');
+                  listProvider
+                      .getAllTasksFromFireStore(userProvider.currentUser!.id);
                 });
               },
               backgroundColor: Color(0xFFFE4A49),
@@ -112,14 +121,21 @@ class _TaskListItemState extends State<TaskListItem> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18))),
                       onPressed: () {
+                        var userProvider =
+                            Provider.of<UserProvider>(context, listen: false);
                         setState(() {
                           widget.task.isDone = !widget.task.isDone;
-                          FirebaseUtils.editTaskFromFireStore(widget.task)
-                              .timeout(
+                          FirebaseUtils.editTaskFromFireStore(
+                                  widget.task, userProvider.currentUser!.id)
+                              .then((value) {
+                            listProvider.getAllTasksFromFireStore(
+                                userProvider.currentUser!.id);
+                          }).timeout(
                             Duration(seconds: 1),
                             onTimeout: () {
                               print('task updated successfully');
-                              listProvider.getAllTasksFromFireStore();
+                              listProvider.getAllTasksFromFireStore(
+                                  userProvider.currentUser!.id);
                             },
                           );
                         });

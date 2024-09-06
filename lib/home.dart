@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/add_task_bot_sheet.dart';
 import 'package:todo_app/app_colors.dart';
+import 'package:todo_app/auth/login/login.dart';
+import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/settings_tab.dart';
 import 'package:todo_app/task_list_tab.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,15 +21,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
+    var listProvider = Provider.of<ListProvider>(context);
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: MediaQuery.of(context).size.height * 0.15,
         title: Text(
           selectedIndex == 0
-              ? AppLocalizations.of(context)!.app_title
+              ? '${AppLocalizations.of(context)!.app_title}{${userProvider.currentUser!.name}}'
               : AppLocalizations.of(context)!.settings,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                listProvider.tasksList = [];
+                //userProvider.currentUser = null;
+                Navigator.of(context)
+                    .pushReplacementNamed(LoginScreen.routeName);
+              },
+              icon: Icon(
+                Icons.logout,
+                color: AppColors.whiteColor,
+              ))
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),

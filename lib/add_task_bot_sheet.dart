@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   Task? task;
@@ -150,16 +151,22 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   void addTask() {
     if (formKey.currentState?.validate() == true) {
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+
       Task task = Task(
         title: title,
         description: description,
         datetime: selectDate,
       );
-      FirebaseUtils.addTaskToFireStore(task).timeout(
+      FirebaseUtils.addTaskToFireStore(task, userProvider.currentUser!.id)
+          .then((value) {
+        listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id);
+        Navigator.pop(context);
+      }).timeout(
         Duration(seconds: 1),
         onTimeout: () {
           print('task added successfully');
-          listProvider.getAllTasksFromFireStore();
+          listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id);
           Navigator.pop(context);
         },
       );
@@ -169,6 +176,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 //////////////////////////////////////////////////////////////
   void editTask() {
     if (formKey.currentState?.validate() == true) {
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
       Task updatedTask = Task(
         id: widget.task!.id,
 
@@ -177,11 +185,16 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         description: description,
         datetime: selectDate,
       );
-      FirebaseUtils.editTaskFromFireStore(updatedTask).timeout(
+      FirebaseUtils.editTaskFromFireStore(
+              updatedTask, userProvider.currentUser!.id)
+          .then((value) {
+        listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id);
+        Navigator.pop(context);
+      }).timeout(
         Duration(seconds: 1),
         onTimeout: () {
           print('task edited successfully');
-          listProvider.getAllTasksFromFireStore();
+          listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id);
           Navigator.pop(context);
         },
       );

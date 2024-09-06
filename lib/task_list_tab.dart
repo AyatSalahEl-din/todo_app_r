@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/model/task.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 import 'package:todo_app/task_list_item.dart';
 
 class TaskListTab extends StatefulWidget {
@@ -17,15 +18,17 @@ class _TaskListTabState extends State<TaskListTab> {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<ListProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context);
     if (listProvider.tasksList.isEmpty) {
-      listProvider.getAllTasksFromFireStore();
+      listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id);
     }
     return Column(
       children: [
         EasyDateTimeLine(
           initialDate: DateTime.now(),
           onDateChange: (selectedDate) {
-            listProvider.changeSelectDate(selectedDate);
+            listProvider.changeSelectDate(
+                selectedDate, userProvider.currentUser!.id);
           },
           headerProps: const EasyHeaderProps(
             monthPickerType: MonthPickerType.switcher,
@@ -50,7 +53,7 @@ class _TaskListTabState extends State<TaskListTab> {
         ),
         Expanded(
           child: listProvider.tasksList.isEmpty
-              ? Text('No Tasks Added')
+              ? Center(child: Text('No Tasks Added'))
               : ListView.builder(
                   itemBuilder: (context, index) {
                     return TaskListItem(

@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/auth/custom_text_form_field.dart';
 import 'package:todo_app/dialog_utils.dart';
 import 'package:todo_app/firebase_utils.dart';
 import 'package:todo_app/home.dart';
 import 'package:todo_app/model/my_user.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = 'register_screen';
@@ -176,6 +178,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         print('before database');
         await FirebaseUtils.addUserToFireStore(myUser);
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateUser(myUser);
         print('after database');
 
         //hide loading
